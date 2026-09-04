@@ -13,7 +13,7 @@ public:
 
     ~AtomImpl() = default;
     
-    void SetDatabaseFolder(const std::string& dbFolderPath)
+    bool SetDatabaseFolder(const std::string& dbFolderPath)
     {
         
         if (std::filesystem::exists(dbFolderPath))
@@ -22,15 +22,17 @@ public:
                 std::format("Successfully located database folder: '{}'", dbFolderPath));
 
             mDbFolderPath = dbFolderPath;
+            return true;
         }
         else
         {
             Debugger::PrintError(
                 std::format("Failed to locate database folder: '{}'", dbFolderPath)); 
+            return false;
         }
     }
 
-    void InitializeDatabase()
+    bool InitializeDatabase()
     {
         if (mDbFolderPath.has_value())
         {
@@ -40,6 +42,7 @@ public:
             if (std::filesystem::exists(expectedMainPath))
             {
                 Debugger::PrintInfo("Successfully loaded existing database");
+                return true;
             }else
             {
                 std::ofstream mainFile;
@@ -47,16 +50,19 @@ public:
                 if (!mainFile.is_open())
                 {
                     Debugger::PrintError("Failed to create main database file");
+                    return false;
                 }else
                 {
                     mainFile.close();
                     Debugger::PrintInfo("Successfully created new database");
+                    return true;
                 }
             }
         }else
         {
             Debugger::PrintError(
                 "Cannot initialize database without specifing the database folder first");
+            return false;
         }
     }
 public:
@@ -68,12 +74,12 @@ Atom::Atom() :
 
 Atom::~Atom() = default;
 
-void Atom::SetDatabaseFolder(const std::string& dbFolderPath)
+[[nodiscard]]bool Atom::SetDatabaseFolder(const std::string& dbFolderPath)
 {
     return mImpl->SetDatabaseFolder(dbFolderPath);
 }
 
-void Atom::InitializeDatabase()
+[[nodiscard]]bool Atom::InitializeDatabase()
 {
-    mImpl->InitializeDatabase();
+    return mImpl->InitializeDatabase();
 }

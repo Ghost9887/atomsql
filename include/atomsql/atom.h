@@ -10,8 +10,8 @@ public:
     Atom();
     ~Atom();
 
-    void SetDatabaseFolder(const std::string& dbFolderPath);
-    void InitializeDatabase();
+    [[nodiscard]]bool SetDatabaseFolder(const std::string& dbFolderPath);
+    [[nodiscard]]bool InitializeDatabase();
 private:
     class AtomImpl;
     std::unique_ptr<AtomImpl> mImpl;
