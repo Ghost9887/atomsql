@@ -7,12 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(SOURCES
     src/main.cpp
+    src/atom.cpp
+    src/engine/btree.cpp
+    src/utility/debugger.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
 )
 
-add_compile_options(-Wall -Wextra -Wpedantic)
+add_compile_options(PRIVATE -Wall -Wextra -Wpedantic)
