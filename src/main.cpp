@@ -3,8 +3,8 @@
 int main([[maybe_unused]]int argc, [[maybe_unused]]char** argv)
 {
     Atom atom;
-    bool res = atom.SetDatabaseFolder("../data");
-    if (!res) return 1;
+    atom.SetDatabaseFolder("../data");
+    atom.InitializeDatabase();
 
     return 0;
 }
