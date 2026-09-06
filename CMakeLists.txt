@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCES
     src/main.cpp
     src/atom.cpp
-    src/engine/btree.cpp
+    src/engine/atom_engine.cpp
     src/utility/debugger.cpp
 )
 

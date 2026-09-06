@@ -1,5 +1,6 @@
 #include "atomsql/atom.h"
 #include "atomsql/debugger.h"
+#include "atomsql/atom_engine.h"
 #include <optional>
 #include <filesystem>
 #include <fstream>
@@ -9,10 +10,37 @@ class Atom::AtomImpl
 {
 public:
     AtomImpl() :
-        mDbFolderPath(std::nullopt) {}
+        mDbFolderPath(std::nullopt), mStorageEngine(std::make_unique<AtomEngine>()) {}
 
     ~AtomImpl() = default;
     
+    bool Initialize(const std::string& dbFolderPath)
+    {
+        if(!SetDatabaseFolder(dbFolderPath)) return false;
+
+        const std::filesystem::path expectedMainPath = 
+            std::format("{}/{}", mDbFolderPath.value().generic_string(), "main.atom");
+
+        if (std::filesystem::exists(expectedMainPath))
+        {
+            Debugger::PrintInfo("Successfully loaded existing database");
+            return true;
+        }else
+        {
+            std::ofstream mainFile;
+            mainFile.open(expectedMainPath);
+            if (!mainFile.is_open())
+            {
+                Debugger::PrintError("Failed to create main database file");
+                return false;
+            }else
+            {
+                mainFile.close();
+                Debugger::PrintInfo("Successfully created new database");
+                return true;
+            }
+        }
+    }    
     bool SetDatabaseFolder(const std::string& dbFolderPath)
     {
         
@@ -31,42 +59,9 @@ public:
             return false;
         }
     }
-
-    bool InitializeDatabase()
-    {
-        if (mDbFolderPath.has_value())
-        {
-            const std::filesystem::path expectedMainPath = 
-                mDbFolderPath.value().generic_string() + "/main.atom";
-
-            if (std::filesystem::exists(expectedMainPath))
-            {
-                Debugger::PrintInfo("Successfully loaded existing database");
-                return true;
-            }else
-            {
-                std::ofstream mainFile;
-                mainFile.open(expectedMainPath);
-                if (!mainFile.is_open())
-                {
-                    Debugger::PrintError("Failed to create main database file");
-                    return false;
-                }else
-                {
-                    mainFile.close();
-                    Debugger::PrintInfo("Successfully created new database");
-                    return true;
-                }
-            }
-        }else
-        {
-            Debugger::PrintError(
-                "Cannot initialize database without specifing the database folder first");
-            return false;
-        }
-    }
 public:
     std::optional<std::filesystem::path> mDbFolderPath;
+    std::unique_ptr<StorageEngine> mStorageEngine;
 };
 
 Atom::Atom() :
@@ -74,12 +69,7 @@ Atom::Atom() :
 
 Atom::~Atom() = default;
 
-[[nodiscard]]bool Atom::SetDatabaseFolder(const std::string& dbFolderPath)
+[[nodiscard]]bool Atom::Initialize(const std::string& dbFolderPath)
 {
-    return mImpl->SetDatabaseFolder(dbFolderPath);
-}
-
-[[nodiscard]]bool Atom::InitializeDatabase()
-{
-    return mImpl->InitializeDatabase();
+    return mImpl->Initialize(dbFolderPath);
 }
