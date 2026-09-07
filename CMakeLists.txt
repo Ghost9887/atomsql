@@ -8,7 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SOURCES
     src/main.cpp
     src/atom.cpp
-    src/engine/atom_engine.cpp
+    src/engine/storage_engine.cpp
+    src/engine/page.cpp
+    src/engine/page_manager.cpp
     src/utility/debugger.cpp
 )
 

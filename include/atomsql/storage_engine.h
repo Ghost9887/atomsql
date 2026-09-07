@@ -1,10 +1,16 @@
 #ifndef STORAGE_ENGINE_H 
 #define STORAGE_ENGINE_H
 
+#include <memory>
+
 class StorageEngine
 {
 public:
-    virtual ~StorageEngine() = default;
+    StorageEngine();
+    ~StorageEngine();
+private:
+    class StorageEngineImpl;
+    std::unique_ptr<StorageEngineImpl> mImpl;
 };
 
 #endif
